@@ -124,14 +124,6 @@ final class Upload {
     $this->files[] = $file;
   }
 
-  public function create_directory($path) {
-    $this->path = $path.'/'.$this->id;
-
-    if (!file_exists($this->path)) {
-      mkdir($this->path, 0700);
-    }
-  }
-
   /**
    * Delete the files on the files system and the directory.
    */
