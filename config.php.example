@@ -1,0 +1,7 @@
+<?php
+
+$config['title'] = 'My Uploader';
+$config['description'] = 'My Description';
+$config['uploads_directory'] = 'uploads';
+
+// End of config.php
