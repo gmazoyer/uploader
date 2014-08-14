@@ -77,8 +77,6 @@ final class Uploader {
       print '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>';
       print '<strong>Error!</strong> Sorry there is no upload here :(';
       print '</div>';
-
-      $this->render_upload_form();
     } else {
       print '<h3>Available files to download <span class="label label-default">';
       print count($upload->get_files());
