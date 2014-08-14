@@ -83,7 +83,9 @@ final class File {
    * @param string $tmp the temporary file which has been uploaded.
    */
   public function save($tmp) {
-    move_uploaded_file($tmp, $this->get_path());
+    if (is_uploaded_file($tmp)) {
+      move_uploaded_file($tmp, $this->get_path());
+    }
   }
 
   /**
