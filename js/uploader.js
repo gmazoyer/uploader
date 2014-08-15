@@ -35,6 +35,7 @@ $('form').ajaxForm({
     var result = $.parseJSON(response);
 
     if (result.error) {
+      $('#files').fileinput('reset');
       $('#error-text').html(result.error);
       $('.alert').slideDown();
     } else {
