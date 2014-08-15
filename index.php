@@ -152,7 +152,7 @@ final class Uploader {
     print '<div class="header">';
     print '<h1>'.$this->config['title'].'</h1>';
     print '</div>';
-    print '<div class="alert alert-danger alert-dismissable" id="error">';
+    print '<div class="alert alert-danger alert-dismissable" style="display: none;" id="error">';
     print '<button type="button" class="close" aria-hidden="true">&times;</button>';
     print '<strong>Error!</strong>&nbsp;<span id="error-text"></span>';
     print '</div>';

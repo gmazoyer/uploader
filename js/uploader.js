@@ -6,9 +6,6 @@ $('#files').fileinput({
 });
 
 $(document).ready(function() {
-  // Hide the alert bar
-  $('.alert').hide();
-
   // Close the alert bar
   $('.close').click(function() {
     $('.alert').slideUp();
