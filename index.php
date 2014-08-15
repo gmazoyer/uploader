@@ -39,6 +39,8 @@ final class Uploader {
   }
 
   public function add_upload($deletion_date, $files) {
+    $accept = true;
+
     // TODO: check for spammer
 
     // Generate a new ID
@@ -54,6 +56,18 @@ final class Uploader {
         $temp = $files['tmp_name'][$key];
         $name = $files['name'][$key];
 
+        // Check that the file type is allowed
+        $info = finfo_open(FILEINFO_MIME_TYPE);
+        $type = finfo_file($info, $temp);
+        if (!in_array($type, $this->config['allowed_file_types'])) {
+          $accept = false;
+          $return = array('error' => 'Error unauthorized MIME type ('.$type.
+                                     ') for '.$name.'.<br />Please check the '.
+                                     'list of authorized MIME types.');
+          break;
+        }
+        finfo_close($info);
+
         $file = new File($upload, $name);
         $file->save($temp);
 
@@ -61,11 +75,17 @@ final class Uploader {
       }
     }
 
-    // Save the upload
-    $this->db->save_upload($upload);
+    if (!$accept) {
+      // All files have been rejected
+      $upload->delete();
+    } else {
+      // Save the upload
+      $this->db->save_upload($upload);
+      // Throw the upload's ID for the Javascript
+      $return = array('success' =>  $upload->get_id());
+    }
 
-    // Throw the upload's ID for the Javascript
-    print $upload->get_id();
+    print json_encode($return);
   }
 
   public function show_upload($id) {
@@ -132,10 +152,25 @@ final class Uploader {
     print '<div class="header">';
     print '<h1>'.$this->config['title'].'</h1>';
     print '</div>';
+    print '<div class="alert alert-danger alert-dismissable" id="error">';
+    print '<button type="button" class="close" aria-hidden="true">&times;</button>';
+    print '<strong>Error!</strong>&nbsp;<span id="error-text"></span>';
+    print '</div>';
   }
 
   public function render_upload_form() {
+    print '<div class="clearfix">';
+    print '<div class="pull-left">';
     print $this->config['description'];
+    print '</div>';
+    print '<div class="pull-right">';
+    print '<button type="button" class="btn btn-info popover-dismiss" data-toggle="popover" title="List of allowed MIME types" data-html=true data-content="<ul>';
+    foreach ($this->config['allowed_file_types'] as $type) {
+      print '<li>'.$type.'</li>';
+    }
+    print '</ul>"><span class="glyphicon glyphicon-flag"></span>&nbsp;Accepted Files</button>';
+    print '</div>';
+    print '</div>';
     print '<form enctype="multipart/form-data" action="." method="post">';
     print '<div class="form-group">';
     print '<label for="expiration">Expiration</label>';

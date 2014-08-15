@@ -23,7 +23,12 @@ $config = array(
   'title' => 'Uploader',
   'description' => '<p>Select the files to upload and their availability period.<br />You can send a maximum of 10 files with a limit of 2GB per file.</p>',
   'bootstrap_theme' => true,
-  'uploads_directory' => 'uploads'
+  'uploads_directory' => 'uploads',
+  'allowed_file_types' => array (
+    'image/gif',
+    'image/jpeg',
+    'image/png',
+  )
 );
 
 // End of config.defaults.php
