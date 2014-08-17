@@ -1,17 +1,24 @@
+# Deny directory listing
+Options -Indexes
+
+# Deny access to the database
 <Files uploader.db>
   Deny from all
 </Files>
 
+# Using mod_rewrite is mandatory
 <IfModule !mod_rewrite.c>
   Redirect 500
 </IfModule>
 
+# Rewrite URL to set proper parameter
 <IfModule mod_rewrite.c>
   RewriteEngine on
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteRule ^([a-zA-ZZ0-9]{6}?)$ index.php?upload=$1 [L]
+  RewriteRule ^([a-zA-ZZ0-9]{6})$ index.php?upload=$1 [L]
 </IfModule>
 
+# Set max values for PHP (can bee changed)
 php_value upload_max_filesize 2048M
 php_value post_max_size       2048M
