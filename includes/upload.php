@@ -116,6 +116,21 @@ final class Upload {
   }
 
   /**
+   * Get the file in this upload with the given filename.
+   *
+   * @return File the file or false if none found.
+   */
+  public function get_file_by_name($filename) {
+    foreach ($this->files as $file) {
+      if ($file->get_name() === $filename) {
+        return $file;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Add the given file to the list of files that are part of the upload.
    *
    * @param File $file the file.

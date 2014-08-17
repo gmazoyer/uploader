@@ -16,7 +16,7 @@ Options -Indexes
   RewriteEngine on
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteRule ^([a-zA-ZZ0-9]{6})$ index.php?upload=$1 [L]
+  RewriteRule . index.php
 </IfModule>
 
 # Set max values for PHP (can bee changed)

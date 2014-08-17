@@ -19,6 +19,21 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
  */
 
+function error_upload_does_not_exist() {
+  print '<div class="alert alert-danger alert-dismissible" role="alert">';
+  print '<button type="button" class="close" data-dismiss="alert">';
+  print '<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>';
+  print '</button><strong>Error!</strong> Sorry there is no upload here :(';
+}
+
+function error_file_does_not_exist() {
+  print '<div class="alert alert-danger alert-dismissible" role="alert">';
+  print '<button type="button" class="close" data-dismiss="alert">';
+  print '<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>';
+  print '</button><strong>Error!</strong> Sorry this file does not exist :(';
+  print '</div>';
+}
+
 function generate_deletion_date($deletion_date) {
   $deletion_date = intval($deletion_date);
 

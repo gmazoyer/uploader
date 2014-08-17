@@ -23,6 +23,7 @@ require_once 'includes/config.defaults.php';
 require_once 'includes/database.php';
 require_once 'includes/file.php';
 require_once 'includes/upload.php';
+require_once 'includes/utils.php';
 require_once 'config.php';
 
 final class Uploader {
@@ -93,10 +94,7 @@ final class Uploader {
     $upload = $this->db->get_upload_from_id($id);
 
     if ($upload === false) {
-      print '<div class="alert alert-danger alert-dismissible" role="alert">';
-      print '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>';
-      print '<strong>Error!</strong> Sorry there is no upload here :(';
-      print '</div>';
+      error_upload_does_not_exist();
     } else {
       print '<h3>Available files to download <span class="label label-default">';
       print count($upload->get_files());
@@ -110,9 +108,9 @@ final class Uploader {
         print $file->get_name();
         print '</span>';
         print '<span class="list-group-item-btn-dl">';
-        print '<a href="./';
-        print $file->get_path();
-        print '" class="btn btn-success" role="button"><span class="glyphicon glyphicon-save"></span></a>';
+        print '<a href="./'.$upload->get_id().'/'.$file->get_name();
+        print '" class="btn btn-success" role="button">';
+        print '<span class="glyphicon glyphicon-save"></span></a>';
         print '</span>';
         print '</div>';
       }
@@ -129,6 +127,37 @@ final class Uploader {
       print '</span>';
       print '</div>';
       print '</div>';
+    }
+  }
+
+  public function send_file($id, $filename) {
+    $id = SQLite3::escapeString($id);
+    $upload = $this->db->get_upload_from_id($id);
+
+    if ($upload === false) {
+      error_upload_does_not_exist();
+    } else {
+      $file = $upload->get_file_by_name($filename);
+
+      if ($file === false) {
+        error_file_does_not_exist();
+      } else {
+        $path = $file->get_path();
+
+        if (isset($path) && file_exists($path)) {
+          $info = finfo_open(FILEINFO_MIME_TYPE);
+          $type = finfo_file($info, $path);
+          finfo_close($info);
+
+          header('Content-Type: '.$type);
+          header('Expires: 0');
+          header('Content-Length: '.filesize($path));
+
+          $handle = fopen($path, 'r');
+          fpassthru($handle);
+          fclose($handle);
+        }
+      }
     }
   }
 
@@ -226,15 +255,21 @@ if (php_sapi_name() == 'cli') {
 if (isset($_FILES) && !empty($_FILES) && isset($_POST['expiration'])) {
   $uploader->add_upload($_POST['expiration'], $_FILES['files']);
 } else {
-  $uploader->render_top();
+  $uri = explode('/', $_SERVER['REQUEST_URI']);
 
-  if (isset($_GET['upload'])) {
-    $uploader->show_upload($_GET['upload']);
+  if (isset($uri[3]) && (strlen($uri[3]) > 0)) {
+    $uploader->send_file($uri[2], $uri[3]);
   } else {
-    $uploader->render_upload_form();
-  }
+    $uploader->render_top();
 
-  $uploader->render_bottom();
+    if (isset($uri[2]) && (strlen($uri[2]) === 6)) {
+      $uploader->show_upload($uri[2]);
+    } else {
+      $uploader->render_upload_form();
+    }
+
+    $uploader->render_bottom();
+  }
 }
 
 // End of index.php
