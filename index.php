@@ -194,8 +194,13 @@ final class Uploader {
           $type = finfo_file($info, $path);
           finfo_close($info);
 
-          header('Content-Type: '.$type);
+          header('Cache-Control: no-cache, must-revalidate');
+          header('Cache-Control: post-check=0,pre-check=0');
+          header('Cache-Control: max-age=0');
+          header('Pragma: no-cache');
           header('Expires: 0');
+
+          header('Content-Type: '.$type);
           header('Content-Length: '.filesize($path));
 
           $handle = fopen($path, 'r');
