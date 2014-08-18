@@ -99,17 +99,17 @@ final class Uploader {
 
         // Check that the file type is allowed
         $info = finfo_open(FILEINFO_MIME_TYPE);
-        $type = finfo_file($info, $temp);
-        if (!in_array($type, $this->config['allowed_file_types'])) {
+        $mime = finfo_file($info, $temp);
+        if (!in_array($mime, $this->config['allowed_file_types'])) {
           $accept = false;
-          $return = array('error' => 'Error unauthorized MIME type ('.$type.
+          $return = array('error' => 'Error unauthorized MIME type ('.$mime.
                                      ') for '.$name.'.<br />Please check the '.
                                      'list of authorized MIME types.');
           break;
         }
         finfo_close($info);
 
-        $file = new File($upload, $name);
+        $file = new File($upload, $name, $mime);
         $file->save($temp);
 
         $upload->add_file($file);
@@ -188,19 +188,16 @@ final class Uploader {
         header('location: ./nofile');
       } else {
         $path = $file->get_path();
+        $mime = $file->get_mime_type();
 
         if (isset($path) && file_exists($path)) {
-          $info = finfo_open(FILEINFO_MIME_TYPE);
-          $type = finfo_file($info, $path);
-          finfo_close($info);
-
           header('Cache-Control: no-cache, must-revalidate');
           header('Cache-Control: post-check=0,pre-check=0');
           header('Cache-Control: max-age=0');
           header('Pragma: no-cache');
           header('Expires: 0');
 
-          header('Content-Type: '.$type);
+          header('Content-Type: '.$mime);
           header('Content-Length: '.filesize($path));
 
           $handle = fopen($path, 'r');

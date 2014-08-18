@@ -66,7 +66,8 @@ final class Database {
       'CREATE TABLE IF NOT EXISTS files (
         id INTEGER PRIMARY KEY,
         upload TEXT,
-        name TEXT
+        name TEXT,
+        mime TEXT
       );'
     );
     $this->db->exec(
@@ -123,10 +124,11 @@ final class Database {
     // Insert each file
     foreach ($files as $file) {
       $name = $file->get_name();
+      $mime = $file->get_mime_type();
 
       $this->db->exec(
-        "INSERT INTO files (id, upload, name)
-         VALUES (NULL, '$id', '$name');");
+        "INSERT INTO files (id, upload, name, mime)
+         VALUES (NULL, '$id', '$name', '$mime');");
     }
   }
 
@@ -164,7 +166,7 @@ final class Database {
     // Fetch each file
     while ($result = $request->fetchArray()) {
       // And add it to the upload
-      $file = new File($upload, $result['name']);
+      $file = new File($upload, $result['name'], $result['mime']);
       $upload->add_file($file);
     }
 

@@ -40,14 +40,21 @@ final class File {
   private $name;
 
   /**
+   * The MIME type of the file.
+   */
+  private $mime;
+
+  /**
    * Build a new File object with the given parameters.
    *
    * @param Upload $upload the upload that this file is part of.
    * @param string $name   the name of this file.
+   * @paran string $mime   the MIME type of this file.
    */
-  public function __construct($upload, $name) {
+  public function __construct($upload, $name, $mime) {
     $this->upload = $upload;
     $this->name = $name;
+    $this->mime = $mime;
   }
 
   /**
@@ -66,6 +73,15 @@ final class File {
    */
   public function get_name() {
     return $this->name;
+  }
+
+  /**
+   * Get the MIME type of this file.
+   *
+   * @return string the MIME type.
+   */
+  public function get_mime_type() {
+    return $this->mime;
   }
 
   /**
