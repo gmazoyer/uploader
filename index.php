@@ -39,6 +39,46 @@ final class Uploader {
     }
   }
 
+  private function render_top() {
+    print '<!DOCTYPE html>';
+    print '<html lang="en">';
+    print '<head>';
+    print '<meta charset="utf-8" />';
+    print '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
+    print '<meta name="viewport" content="width=device-width, initial-scale=1" />';
+    print '<title>'.htmlentities($this->config['title']).'</title>';
+    print '<link href="libs/bootstrap-3.2.0/css/bootstrap.min.css" rel="stylesheet" />';
+    if ($this->config['bootstrap_theme']) {
+      print '<link href="libs/bootstrap-3.2.0/css/bootstrap-theme.min.css" rel="stylesheet" />';
+    }
+    print '<link href="libs/fileinput/css/fileinput.min.css" rel="stylesheet" />';
+    print '<link href="css/style.css" rel="stylesheet" />';
+    print '</head>';
+    print '<body>';
+    print '<div class="container">';
+    print '<div class="header">';
+    print '<h1>'.htmlentities($this->config['title']).'</h1>';
+    print '</div>';
+    print '<div class="alert alert-danger alert-dismissable" style="display: none;" id="error">';
+    print '<button type="button" class="close" aria-hidden="true">&times;</button>';
+    print '<strong>Error!</strong>&nbsp;<span id="error-text"></span>';
+    print '</div>';
+  }
+
+
+  private function render_bottom() {
+    print '<div class="footer">';
+    print '</div>';
+    print '</div>';
+    print '</body>';
+    print '<script src="js/jquery-2.1.1.min.js"></script>';
+    print '<script src="js/jquery.form.min.js"></script>';
+    print '<script src="libs/bootstrap-3.2.0/js/bootstrap.min.js"></script>';
+    print '<script src="libs/fileinput/js/fileinput.min.js"></script>';
+    print '<script src="js/uploader.js"></script>';
+    print '</html>';
+  }
+
   public function add_upload($deletion_date, $files) {
     $accept = true;
 
@@ -94,9 +134,12 @@ final class Uploader {
     $upload = $this->db->get_upload_from_id($id);
 
     if ($upload === false) {
-      error_upload_does_not_exist();
+      header('location: ./noupload');
     } else {
-      print '<h3>Available files to download <span class="label label-default">';
+      $this->render_top();
+
+      print '<h3>Available files to download ';
+      print '<span class="label label-default">';
       print count($upload->get_files());
       print '</span></h3>';
       print '<div class="list-group">';
@@ -127,6 +170,8 @@ final class Uploader {
       print '</span>';
       print '</div>';
       print '</div>';
+
+      $this->render_bottom();
     }
   }
 
@@ -135,12 +180,12 @@ final class Uploader {
     $upload = $this->db->get_upload_from_id($id);
 
     if ($upload === false) {
-      error_upload_does_not_exist();
+      header('location: ./noupload');
     } else {
       $file = $upload->get_file_by_name($filename);
 
       if ($file === false) {
-        error_file_does_not_exist();
+        header('location: ./nofile');
       } else {
         $path = $file->get_path();
 
@@ -161,33 +206,32 @@ final class Uploader {
     }
   }
 
-  public function render_top() {
-    print '<!DOCTYPE html>';
-    print '<html lang="en">';
-    print '<head>';
-    print '<meta charset="utf-8" />';
-    print '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
-    print '<meta name="viewport" content="width=device-width, initial-scale=1" />';
-    print '<title>'.$this->config['title'].'</title>';
-    print '<link href="libs/bootstrap-3.2.0/css/bootstrap.min.css" rel="stylesheet" />';
-    if ($this->config['bootstrap_theme']) {
-      print '<link href="libs/bootstrap-3.2.0/css/bootstrap-theme.min.css" rel="stylesheet" />';
-    }
-    print '<link href="libs/fileinput/css/fileinput.min.css" rel="stylesheet" />';
-    print '<link href="css/style.css" rel="stylesheet" />';
-    print '</head>';
-    print '<body>';
-    print '<div class="container">';
-    print '<div class="header">';
-    print '<h1>'.$this->config['title'].'</h1>';
+  public function error_upload_does_not_exist() {
+    $this->render_top();
+
+    print '<div class="alert alert-danger alert-dismissible" role="alert">';
+    print '<button type="button" class="close" data-dismiss="alert">';
+    print '<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>';
+    print '</button><strong>Error!</strong> Sorry there is no upload here :(';
+
+    $this->render_bottom();
+  }
+
+  public function error_file_does_not_exist() {
+    $this->render_top();
+
+    print '<div class="alert alert-danger alert-dismissible" role="alert">';
+    print '<button type="button" class="close" data-dismiss="alert">';
+    print '<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>';
+    print '</button><strong>Error!</strong> Sorry this file does not exist :(';
     print '</div>';
-    print '<div class="alert alert-danger alert-dismissable" style="display: none;" id="error">';
-    print '<button type="button" class="close" aria-hidden="true">&times;</button>';
-    print '<strong>Error!</strong>&nbsp;<span id="error-text"></span>';
-    print '</div>';
+
+    $this->render_bottom();
   }
 
   public function render_upload_form() {
+    $this->render_top();
+
     print '<div class="clearfix">';
     print '<div class="pull-left">';
     print $this->config['description'];
@@ -224,19 +268,8 @@ final class Uploader {
     print '</div>';
     print '</div>';
     print '</div>';
-  }
 
-  public function render_bottom() {
-    print '<div class="footer">';
-    print '</div>';
-    print '</div>';
-    print '</body>';
-    print '<script src="js/jquery-2.1.1.min.js"></script>';
-    print '<script src="js/jquery.form.min.js"></script>';
-    print '<script src="libs/bootstrap-3.2.0/js/bootstrap.min.js"></script>';
-    print '<script src="libs/fileinput/js/fileinput.min.js"></script>';
-    print '<script src="js/uploader.js"></script>';
-    print '</html>';
+    $this->render_bottom();
   }
 
   public function cron() {
@@ -257,18 +290,26 @@ if (isset($_FILES) && !empty($_FILES) && isset($_POST['expiration'])) {
 } else {
   $uri = explode('/', $_SERVER['REQUEST_URI']);
 
-  if (isset($uri[3]) && (strlen($uri[3]) > 0)) {
-    $uploader->send_file($uri[2], $uri[3]);
+  if (!isset($uri[2]) || empty($uri[2])) {
+    $uploader->render_upload_form();
   } else {
-    $uploader->render_top();
+    switch ($uri[2]) {
+      case 'nofile':
+        $uploader->error_file_does_not_exist();
+        break;
 
-    if (isset($uri[2]) && (strlen($uri[2]) === 6)) {
-      $uploader->show_upload($uri[2]);
-    } else {
-      $uploader->render_upload_form();
+      case 'noupload':
+        $uploader->error_upload_does_not_exist();
+        break;
+
+      default:
+        if (!isset($uri[3])) {
+          $uploader->show_upload($uri[2]);
+        } else {
+          $uploader->send_file($uri[2], $uri[3]);
+        }
+        break;
     }
-
-    $uploader->render_bottom();
   }
 }
 
