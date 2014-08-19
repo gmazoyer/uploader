@@ -137,6 +137,8 @@ final class Uploader {
     if ($upload === false) {
       header('location: ./noupload');
     } else {
+      $total_size = 0;
+
       $this->render_top();
 
       print '<h3>Available files to download ';
@@ -146,6 +148,8 @@ final class Uploader {
       print '<div class="list-group">';
 
       foreach ($upload->get_files() as $file) {
+        $total_size += $file->get_size();
+
         print '<div class="list-group-item row">';
         print '<div class="col-xs-1">';
         print '<span class="glyphicon glyphicon-file"></span>';
@@ -170,11 +174,24 @@ final class Uploader {
 
       print '</div>';
       print '<div class="row">';
-      print '<div class="col-xs-12 col-sm-6 col-md-8">';
+      print '<div class="col-xs-12">';
+      print '<span class="glyphicon glyphicon-hdd"></span>&nbsp;';
+      print 'Total size for this upload:';
+      print '</div>';
+      print '<div class="col-xs-12">';
+      print '<div class="pull-right">';
+      print '<span class="label label-warning">';
+      print format_size($total_size);;
+      print '</span>';
+      print '</div>';
+      print '</div>';
+      print '</div>';
+      print '<div class="row">';
+      print '<div class="col-xs-12">';
       print '<span class="glyphicon glyphicon-time"></span>&nbsp;';
       print 'Files are available until:';
       print '</div>';
-      print '<div class="col-xs-6 col-sm-6 col-md-4">';
+      print '<div class="col-xs-12">';
       print '<div class="pull-right">';
       print '<span class="label label-warning">';
       print date('d/m/Y - h:i:s A', $upload->get_deletion_date());
