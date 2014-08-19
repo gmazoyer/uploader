@@ -56,9 +56,9 @@ final class Uploader {
     print '</head>';
     print '<body>';
     print '<div class="container">';
-    print '<div class="header">';
+    print '<div class="header"><a href="." title="Home">';
     print '<h1>'.htmlentities($this->config['title']).'</h1>';
-    print '</div>';
+    print '</a></div>';
     print '<div class="alert alert-danger alert-dismissable" style="display: none;" id="error">';
     print '<button type="button" class="close" aria-hidden="true">&times;</button>';
     print '<strong>Error!</strong>&nbsp;<span id="error-text"></span>';
