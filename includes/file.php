@@ -45,16 +45,23 @@ final class File {
   private $mime;
 
   /**
+   * The size of the file in octets.
+   */
+  private $size;
+
+  /**
    * Build a new File object with the given parameters.
    *
-   * @param Upload $upload the upload that this file is part of.
-   * @param string $name   the name of this file.
-   * @paran string $mime   the MIME type of this file.
+   * @param Upload  $upload the upload that this file is part of.
+   * @param string  $name   the name of this file.
+   * @param string  $mime   the MIME type of this file.
+   * @param integer $size   the size of this file.
    */
-  public function __construct($upload, $name, $mime) {
+  public function __construct($upload, $name, $mime, $size) {
     $this->upload = $upload;
     $this->name = $name;
     $this->mime = $mime;
+    $this->size = $size;
   }
 
   /**
@@ -82,6 +89,15 @@ final class File {
    */
   public function get_mime_type() {
     return $this->mime;
+  }
+
+  /**
+   * Get the size of this file.
+   *
+   * @return integer the size in octets.
+   */
+  public function get_size() {
+    return $this->size;
   }
 
   /**

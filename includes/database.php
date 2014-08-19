@@ -67,7 +67,8 @@ final class Database {
         id INTEGER PRIMARY KEY,
         upload TEXT,
         name TEXT,
-        mime TEXT
+        mime TEXT,
+        size INTEGER
       );'
     );
     $this->db->exec(
@@ -125,10 +126,11 @@ final class Database {
     foreach ($files as $file) {
       $name = $file->get_name();
       $mime = $file->get_mime_type();
+      $size = $file->get_size();
 
       $this->db->exec(
-        "INSERT INTO files (id, upload, name, mime)
-         VALUES (NULL, '$id', '$name', '$mime');");
+        "INSERT INTO files (id, upload, name, mime, size)
+         VALUES (NULL, '$id', '$name', '$mime', '$size');");
     }
   }
 
@@ -166,7 +168,8 @@ final class Database {
     // Fetch each file
     while ($result = $request->fetchArray()) {
       // And add it to the upload
-      $file = new File($upload, $result['name'], $result['mime']);
+      $file = new File($upload,         $result['name'],
+                       $result['mime'], $result['size']);
       $upload->add_file($file);
     }
 

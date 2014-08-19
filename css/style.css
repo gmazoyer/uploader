@@ -1,14 +1,15 @@
+.row {
+  display:          table;
+}
+[class*="col-"] {
+  float:            none;
+  display:          table-cell;
+  vertical-align:   middle;
+}
 .container {
   width:            50%;
   margin-left:      auto;
   margin-right:     auto;
-}
-.list-group-item-text {
-  width: 89% !important;
-  display: inline-block !important;
-}
-.list-group-item-btn-dl {
-  display: inline-block !important;
 }
 a, a:hover {
   color:            #000000;

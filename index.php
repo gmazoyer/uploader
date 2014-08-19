@@ -96,6 +96,7 @@ final class Uploader {
       if ($error == UPLOAD_ERR_OK) {
         $temp = $files['tmp_name'][$key];
         $name = $files['name'][$key];
+        $size = filesize($temp);
 
         // Check that the file type is allowed
         $info = finfo_open(FILEINFO_MIME_TYPE);
@@ -109,7 +110,7 @@ final class Uploader {
         }
         finfo_close($info);
 
-        $file = new File($upload, $name, $mime);
+        $file = new File($upload, $name, $mime, $size);
         $file->save($temp);
 
         $upload->add_file($file);
@@ -145,16 +146,25 @@ final class Uploader {
       print '<div class="list-group">';
 
       foreach ($upload->get_files() as $file) {
-        print '<div class="list-group-item clearfix">';
+        print '<div class="list-group-item row">';
+        print '<div class="col-xs-1">';
         print '<span class="glyphicon glyphicon-file"></span>&nbsp;';
-        print '<span class="list-group-item-text">';
+        print '</div>';
+        print '<div class="col-xs-8"><h5 class="list-group-item-heading">';
         print $file->get_name();
-        print '</span>';
-        print '<span class="list-group-item-btn-dl">';
+        print '</h5><p class="list-group-item-text">';
+        print '<span class="label label-primary">';
+        print $file->get_mime_type();
+        print '</span>&nbsp;<span class="label label-success">';
+        print format_size($file->get_size());
+        print '</span></p></div>';
+        print '<div class="col-xs-3">';
+        print '<div class="pull-right">';
         print '<a href="./'.$upload->get_id().'/'.$file->get_name();
         print '" class="btn btn-success" role="button">';
         print '<span class="glyphicon glyphicon-save"></span></a>';
-        print '</span>';
+        print '</div>';
+        print '</div>';
         print '</div>';
       }
 
@@ -164,10 +174,12 @@ final class Uploader {
       print '<span class="glyphicon glyphicon-time"></span>&nbsp;';
       print 'Files are available until:';
       print '</div>';
-      print '<div class="col-xs-6 col-md-4">';
+      print '<div class="col-xs-6 col-sm-6 col-md-4">';
+      print '<div class="pull-right">';
       print '<span class="label label-warning">';
       print date('d/m/Y - h:i:s A', $upload->get_deletion_date());
       print '</span>';
+      print '</div>';
       print '</div>';
       print '</div>';
 
@@ -189,6 +201,7 @@ final class Uploader {
       } else {
         $path = $file->get_path();
         $mime = $file->get_mime_type();
+        $size = $file->get_size();
 
         if (isset($path) && file_exists($path)) {
           header('Cache-Control: no-cache, must-revalidate');
@@ -198,7 +211,7 @@ final class Uploader {
           header('Expires: 0');
 
           header('Content-Type: '.$mime);
-          header('Content-Length: '.filesize($path));
+          header('Content-Length: '.$size);
 
           $handle = fopen($path, 'r');
           fpassthru($handle);
