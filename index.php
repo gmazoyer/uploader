@@ -148,7 +148,7 @@ final class Uploader {
       foreach ($upload->get_files() as $file) {
         print '<div class="list-group-item row">';
         print '<div class="col-xs-1">';
-        print '<span class="glyphicon glyphicon-file"></span>&nbsp;';
+        print '<span class="glyphicon glyphicon-file"></span>';
         print '</div>';
         print '<div class="col-xs-8"><h5 class="list-group-item-heading">';
         print $file->get_name();
