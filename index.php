@@ -59,7 +59,12 @@ final class Uploader {
     print '<div class="header"><a href="." title="Home">';
     print '<h1>'.htmlentities($this->config['title']).'</h1>';
     print '</a></div>';
+    print '<div class="alert alert-danger alert-dismissable" style="display: none;" id="error">';
+    print '<button type="button" class="close" aria-hidden="true">&times;</button>';
+    print '<strong>Error!</strong>&nbsp;<span id="error-text"></span>';
+    print '</div>';
   }
+
 
   private function render_bottom() {
     print '<div class="footer">';
