@@ -79,6 +79,26 @@ final class Uploader {
     print '</html>';
   }
 
+  private function error_upload_does_not_exist($upload) {
+    print '<div class="alert alert-danger alert-dismissible" role="alert">';
+    print '<button type="button" class="close" data-dismiss="alert">';
+    print '<span aria-hidden="true">&times;</san><span class="sr-only">Close</span>';
+    print '</button><strong>Error!</strong> Sorry the upload <strong>';
+    print $upload;
+    print '</strong> does not exist :(';
+    print '</div>';
+  }
+
+  private function error_file_does_not_exist($file) {
+    print '<div class="alert alert-danger alert-dismissible" role="alert">';
+    print '<button type="button" class="close" data-dismiss="alert">';
+    print '<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>';
+    print '</button><strong>Error!</strong> Sorry the file <strong>';
+    print $file;
+    print '</strong> does not exist :(';
+    print '</div>';
+  }
+
   public function add_upload($deletion_date, $files) {
     $accept = true;
 
@@ -135,7 +155,8 @@ final class Uploader {
     $upload = $this->db->get_upload_from_id($id);
 
     if ($upload === false) {
-      header('location: ./noupload');
+      $_SESSION['noupload'] = $id;
+      header('location: .');
     } else {
       $total_size = 0;
 
@@ -209,12 +230,14 @@ final class Uploader {
     $upload = $this->db->get_upload_from_id($id);
 
     if ($upload === false) {
-      header('location: ./noupload');
+      $_SESSION['noupload'] = $id;
+      header('location: .');
     } else {
       $file = $upload->get_file_by_name($filename);
 
       if ($file === false) {
-        header('location: ./nofile');
+        $_SESSION['nofile'] = $filename;
+        header('location: ..');
       } else {
         $path = $file->get_path();
         $mime = $file->get_mime_type();
@@ -238,31 +261,18 @@ final class Uploader {
     }
   }
 
-  public function error_upload_does_not_exist() {
-    $this->render_top();
-
-    print '<div class="alert alert-danger alert-dismissible" role="alert">';
-    print '<button type="button" class="close" data-dismiss="alert">';
-    print '<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>';
-    print '</button><strong>Error!</strong> Sorry there is no upload here :(';
-
-    $this->render_bottom();
-  }
-
-  public function error_file_does_not_exist() {
-    $this->render_top();
-
-    print '<div class="alert alert-danger alert-dismissible" role="alert">';
-    print '<button type="button" class="close" data-dismiss="alert">';
-    print '<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>';
-    print '</button><strong>Error!</strong> Sorry this file does not exist :(';
-    print '</div>';
-
-    $this->render_bottom();
-  }
-
   public function render_upload_form() {
     $this->render_top();
+
+    if (isset($_SESSION['noupload'])) {
+      $this->error_upload_does_not_exist($_SESSION['noupload']);
+      session_unset();
+    }
+
+    if (isset($_SESSION['nofile'])) {
+      $this->error_file_does_not_exist($_SESSION['nofile']);
+      session_unset();
+    }
 
     print '<div class="clearfix">';
     print '<div class="pull-left">';
@@ -309,6 +319,9 @@ final class Uploader {
   }
 }
 
+// There could be info in a session
+session_start();
+
 $uploader = new Uploader($config);
 
 // Launched from CLI, cron cleanup
@@ -322,25 +335,14 @@ if (isset($_FILES) && !empty($_FILES) && isset($_POST['expiration'])) {
 } else {
   $uri = explode('/', $_SERVER['REQUEST_URI']);
 
-  if (!isset($uri[2]) || empty($uri[2])) {
+  if (!isset($uri[2]) || empty($uri[2]) ||
+      isset($_SESSION['noupload']) || isset($_SESSION['nofile'])) {
     $uploader->render_upload_form();
   } else {
-    switch ($uri[2]) {
-      case 'nofile':
-        $uploader->error_file_does_not_exist();
-        break;
-
-      case 'noupload':
-        $uploader->error_upload_does_not_exist();
-        break;
-
-      default:
-        if (!isset($uri[3])) {
-          $uploader->show_upload($uri[2]);
-        } else {
-          $uploader->send_file($uri[2], $uri[3]);
-        }
-        break;
+    if (!isset($uri[3])) {
+      $uploader->show_upload($uri[2]);
+    } else {
+      $uploader->send_file($uri[2], $uri[3]);
     }
   }
 }
