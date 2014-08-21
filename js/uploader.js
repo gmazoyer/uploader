@@ -15,6 +15,19 @@ $(document).ready(function() {
   $('.popover-dismiss').popover({
     trigger: 'focus'
   });
+
+  // Trigger error message if needed
+  if (typeof noupload !== 'undefined') {
+    $('#error-text').html('<strong>Error!</strong> Sorry the upload <strong>'
+                          + noupload + '</strong> does not exist :(');
+    $('.alert').slideDown();
+  }
+
+  if (typeof nofile !== 'undefined') {
+    $('#error-text').html('<strong>Error!</strong> Sorry the file <strong>'
+                          + nofile + '</strong> does not exist :(');
+    $('.alert').slideDown();
+  }
 });
 
 $('form').ajaxForm({

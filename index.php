@@ -56,7 +56,7 @@ final class Uploader {
     print '</head>';
     print '<body>';
     print '<div class="container">';
-    print '<div class="header"><a href="." title="Home">';
+    print '<div class="header text-center"><a href="." title="Home">';
     print '<h1>'.htmlentities($this->config['title']).'</h1>';
     print '</a></div>';
     print '<div class="alert alert-danger alert-dismissable" style="display: none;" id="error">';
@@ -67,7 +67,8 @@ final class Uploader {
 
 
   private function render_bottom() {
-    print '<div class="footer">';
+    print '<div class="footer text-center">';
+    print 'Powered by <a href="https://github.com/respawner/uploader" title="Uploader Project">Uploader</a>';
     print '</div>';
     print '</div>';
     print '</body>';
@@ -77,26 +78,6 @@ final class Uploader {
     print '<script src="libs/fileinput/js/fileinput.min.js"></script>';
     print '<script src="js/uploader.js"></script>';
     print '</html>';
-  }
-
-  private function error_upload_does_not_exist($upload) {
-    print '<div class="alert alert-danger alert-dismissible" role="alert">';
-    print '<button type="button" class="close" data-dismiss="alert">';
-    print '<span aria-hidden="true">&times;</san><span class="sr-only">Close</span>';
-    print '</button><strong>Error!</strong> Sorry the upload <strong>';
-    print $upload;
-    print '</strong> does not exist :(';
-    print '</div>';
-  }
-
-  private function error_file_does_not_exist($file) {
-    print '<div class="alert alert-danger alert-dismissible" role="alert">';
-    print '<button type="button" class="close" data-dismiss="alert">';
-    print '<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>';
-    print '</button><strong>Error!</strong> Sorry the file <strong>';
-    print $file;
-    print '</strong> does not exist :(';
-    print '</div>';
   }
 
   public function add_upload($deletion_date, $files) {
@@ -130,10 +111,12 @@ final class Uploader {
         }
         finfo_close($info);
 
-        $file = new File($upload, $name, $mime, $size);
-        $file->save($temp);
+        if ($accept) {
+          $file = new File($upload, $name, $mime, $size);
+          $file->save($temp);
 
-        $upload->add_file($file);
+          $upload->add_file($file);
+        }
       }
     }
 
@@ -264,16 +247,6 @@ final class Uploader {
   public function render_upload_form() {
     $this->render_top();
 
-    if (isset($_SESSION['noupload'])) {
-      $this->error_upload_does_not_exist($_SESSION['noupload']);
-      session_unset();
-    }
-
-    if (isset($_SESSION['nofile'])) {
-      $this->error_file_does_not_exist($_SESSION['nofile']);
-      session_unset();
-    }
-
     print '<div class="clearfix">';
     print '<div class="pull-left">';
     print $this->config['description'];
@@ -312,6 +285,20 @@ final class Uploader {
     print '</div>';
 
     $this->render_bottom();
+
+    if (isset($_SESSION['noupload'])) {
+      print '<script type="text/javascript">';
+      print 'var noupload = "'.$_SESSION['noupload'].'";';
+      print '</script>';
+      session_unset();
+    }
+
+    if (isset($_SESSION['nofile'])) {
+      print '<script type="text/javascript">';
+      print 'var nofile = "'.$_SESSION['nofile'].'";';
+      print '</script>';
+      session_unset();
+    }
   }
 
   public function cron() {
