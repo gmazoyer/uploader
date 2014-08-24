@@ -18,13 +18,13 @@ $(document).ready(function() {
 
   // Trigger error message if needed
   if (typeof noupload !== 'undefined') {
-    $('#error-text').html('<strong>Error!</strong> Sorry the upload <strong>'
+    $('#error-text').html('Sorry the upload <strong>'
                           + noupload + '</strong> does not exist :(');
     $('.alert').slideDown();
   }
 
   if (typeof nofile !== 'undefined') {
-    $('#error-text').html('<strong>Error!</strong> Sorry the file <strong>'
+    $('#error-text').html('Sorry the file <strong>'
                           + nofile + '</strong> does not exist :(');
     $('.alert').slideDown();
   }

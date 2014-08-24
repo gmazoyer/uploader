@@ -82,6 +82,7 @@ final class Uploader {
 
   public function add_upload($deletion_date, $files) {
     $accept = true;
+    $total = 0;
 
     // TODO: check for spammer
 
@@ -98,18 +99,37 @@ final class Uploader {
         $temp = $files['tmp_name'][$key];
         $name = $files['name'][$key];
         $size = filesize($temp);
+        $total += $size;
 
         // Check that the file type is allowed
         $info = finfo_open(FILEINFO_MIME_TYPE);
         $mime = finfo_file($info, $temp);
         if (!in_array($mime, $this->config['allowed_file_types'])) {
           $accept = false;
-          $return = array('error' => 'Error unauthorized MIME type ('.$mime.
+          $return = array('error' => 'Unauthorized MIME type ('.$mime.
                                      ') for '.$name.'.<br />Please check the '.
                                      'list of authorized MIME types.');
           break;
         }
         finfo_close($info);
+
+        // Too many files
+        if (count($upload->get_files()) > $this->config['upload_max_files']) {
+          $accept = false;
+          $return = array('error' => 'You cannot send more than '.
+                                     $this->config['upload_max_file'].
+                                     ' files');
+          break;
+        }
+
+        // Too heavy upload
+        if ($total > $this->config['upload_max_size']) {
+          $accept = false;
+          $return = array('error' => 'You cannot send more than '.
+                                     format_size($this->config['upload_max_size']).
+                                     ' of files');
+          break;
+        }
 
         if ($accept) {
           $file = new File($upload, $name, $mime, $size);

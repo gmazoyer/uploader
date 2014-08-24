@@ -21,14 +21,16 @@
 
 $config = array(
   'title' => 'Uploader',
-  'description' => '<p>Select the files to upload and their availability period.<br />You can send a maximum of 10 files with a limit of 2GB per file.</p>',
+  'description' => '<p>Select the files to upload and their availability period.<br />You can send a maximum of 10 files with a limit of 2 Gio per upload.</p>',
   'bootstrap_theme' => true,
   'uploads_directory' => 'uploads',
-  'allowed_file_types' => array (
+  'allowed_file_types' => array(
     'image/gif',
     'image/jpeg',
     'image/png',
-  )
+  ),
+  'upload_max_size' => 2147483648,
+  'upload_max_file' => 10
 );
 
 // End of config.defaults.php
