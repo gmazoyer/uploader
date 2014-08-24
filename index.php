@@ -140,7 +140,7 @@ final class Uploader {
       }
     }
 
-    if (!$accept) {
+    if (!$accept || (count($upload->get_files()) < 1)) {
       // All files have been rejected
       $upload->delete();
     } else {
