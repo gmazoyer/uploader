@@ -34,8 +34,8 @@ final class Uploader {
     $this->config = $config;
     $this->db = new Database();
 
-    if (!file_exists($this->config['uploads_directory'])) {
-      mkdir($this->config['uploads_directory'], 0700);
+    if (!file_exists($this->config['upload']['directory'])) {
+      mkdir($this->config['upload']['directory'], 0700);
     }
   }
 
@@ -46,9 +46,9 @@ final class Uploader {
     print '<meta charset="utf-8" />';
     print '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
     print '<meta name="viewport" content="width=device-width, initial-scale=1" />';
-    print '<title>'.htmlentities($this->config['title']).'</title>';
+    print '<title>'.htmlentities($this->config['frontpage']['title']).'</title>';
     print '<link href="libs/bootstrap-3.2.0/css/bootstrap.min.css" rel="stylesheet" />';
-    if ($this->config['bootstrap_theme']) {
+    if ($this->config['frontpage']['bootstrap_theme']) {
       print '<link href="libs/bootstrap-3.2.0/css/bootstrap-theme.min.css" rel="stylesheet" />';
     }
     print '<link href="libs/fileinput/css/fileinput.min.css" rel="stylesheet" />';
@@ -57,7 +57,7 @@ final class Uploader {
     print '<body>';
     print '<div class="container">';
     print '<div class="header text-center"><a href="." title="Home">';
-    print '<h1>'.htmlentities($this->config['title']).'</h1>';
+    print '<h1>'.htmlentities($this->config['frontpage']['title']).'</h1>';
     print '</a></div>';
     print '<div class="alert alert-danger alert-dismissable" style="display: none;" id="error">';
     print '<button type="button" class="close" aria-hidden="true">&times;</button>';
@@ -91,7 +91,7 @@ final class Uploader {
 
     // Create the upload
     $upload = new Upload($id, $deletion_date,
-                         $this->config['uploads_directory']);
+                         $this->config['upload']['directory']);
 
     // Associate each file to the upload
     foreach ($files['error'] as $key => $error) {
@@ -104,7 +104,7 @@ final class Uploader {
         // Check that the file type is allowed
         $info = finfo_open(FILEINFO_MIME_TYPE);
         $mime = finfo_file($info, $temp);
-        if (!in_array($mime, $this->config['allowed_file_types'])) {
+        if (!in_array($mime, $this->config['upload']['allowed_types'])) {
           $accept = false;
           $return = array('error' => 'Unauthorized MIME type ('.$mime.
                                      ') for '.$name.'.<br />Please check the '.
@@ -114,19 +114,19 @@ final class Uploader {
         finfo_close($info);
 
         // Too many files
-        if (count($upload->get_files()) > $this->config['upload_max_files']) {
+        if (count($upload->get_files()) > $this->config['upload']['files']) {
           $accept = false;
           $return = array('error' => 'You cannot send more than '.
-                                     $this->config['upload_max_file'].
+                                     $this->config['upload']['files'].
                                      ' files');
           break;
         }
 
         // Too heavy upload
-        if ($total > $this->config['upload_max_size']) {
+        if ($total > $this->config['upload']['size']) {
           $accept = false;
           $return = array('error' => 'You cannot send more than '.
-                                     format_size($this->config['upload_max_size']).
+                                     format_size($this->config['upload']['size']).
                                      ' of files');
           break;
         }
@@ -269,11 +269,11 @@ final class Uploader {
 
     print '<div class="clearfix">';
     print '<div class="pull-left">';
-    print $this->config['description'];
+    print $this->config['frontpage']['description'];
     print '</div>';
     print '<div class="pull-right">';
     print '<button type="button" class="btn btn-info popover-dismiss" data-toggle="popover" title="List of allowed MIME types" data-html=true data-content="<ul>';
-    foreach ($this->config['allowed_file_types'] as $type) {
+    foreach ($this->config['upload']['allowed_types'] as $type) {
       print '<li>'.$type.'</li>';
     }
     print '</ul>"><span class="glyphicon glyphicon-flag"></span>&nbsp;Accepted Files</button>';

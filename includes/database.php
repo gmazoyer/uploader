@@ -157,7 +157,7 @@ final class Database {
 
     // Build the Upload object
     $upload = new Upload($result['id'], $result['deletion_date'],
-                         $config['uploads_directory'], false);
+                         $config['upload']['directory'], false);
 
     // Query the database for the files
     $request = $this->db->query("SELECT * FROM files WHERE upload = '$id';");
